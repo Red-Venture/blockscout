@@ -69,6 +69,14 @@ export const formatError = (error) => {
   return message
 }
 
+export const formatTitleAndError = (error) => {
+  let { message } = error
+  var title = message && message.split('Error: ').length > 1 ? message.split('Error: ')[1] : message
+  title = title && title.split('{').length > 1 ? title.split('{')[0].replace(':', '') : title
+  message = JSON.parse(message && message.slice(message.indexOf('{'))).error
+  return { title: title, message: message }
+}
+
 export const getCurrentAccount = () => {
   return new Promise((resolve, reject) => {
     window.ethereum.request({ method: 'eth_accounts' })
