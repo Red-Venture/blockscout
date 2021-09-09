@@ -6575,15 +6575,35 @@ defmodule Explorer.Chain do
     json_rpc_named_arguments = Application.get_env(:explorer, :json_rpc_named_arguments)
 
     # https://eips.ethereum.org/EIPS/eip-1967
-    eip_1967_implementation_storage_pointer = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+    storage_slot_logic_contract_address = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+    storage_slot_beacon_contract_address = "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50"
 
     {:ok, implementation_address} =
-      Contract.eth_get_storage_at_request(
-        proxy_address_hash,
-        eip_1967_implementation_storage_pointer,
-        nil,
-        json_rpc_named_arguments
-      )
+      case Contract.eth_get_storage_at_request(
+             proxy_address_hash,
+             storage_slot_logic_contract_address,
+             nil,
+             json_rpc_named_arguments
+           ) do
+        {:ok, "0x"} ->
+          Contract.eth_get_storage_at_request(
+            proxy_address_hash,
+            storage_slot_beacon_contract_address,
+            nil,
+            json_rpc_named_arguments
+          )
+
+        {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"} ->
+          Contract.eth_get_storage_at_request(
+            proxy_address_hash,
+            storage_slot_beacon_contract_address,
+            nil,
+            json_rpc_named_arguments
+          )
+
+        {:ok, implementation_logic_address} ->
+          {:ok, implementation_logic_address}
+      end
 
     abi_decode_address_output(implementation_address)
   end
@@ -6639,6 +6659,8 @@ defmodule Explorer.Chain do
   end
 
   defp abi_decode_address_output(address) when is_nil(address), do: nil
+
+  defp abi_decode_address_output("0x"), do: @burn_address_hash_str
 
   defp abi_decode_address_output(address) do
     if String.length(address) > 42 do
