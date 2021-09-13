@@ -226,7 +226,7 @@ defmodule Explorer.SmartContract.Reader do
   end
 
   @spec read_functions_required_wallet_proxy(Hash.t(), Hash.t()) :: [%{}]
-  def read_functions_required_wallet_proxy(contract_address_hash, implementation_address_hash_string) do
+  def read_functions_required_wallet_proxy(implementation_address_hash_string) do
     implementation_abi = Chain.get_implementation_abi(implementation_address_hash_string)
 
     case implementation_abi do
