@@ -38,8 +38,8 @@ defmodule BlockScoutWeb.SmartContractController do
             Reader.read_only_functions(address_hash)
           end
         end
-      
-      read_functions_required_wallet = 
+
+      read_functions_required_wallet =
         if action == "read" do
           if contract_type == "proxy" do
             Reader.read_functions_required_wallet_proxy(address_hash, implementation_address_hash_string)

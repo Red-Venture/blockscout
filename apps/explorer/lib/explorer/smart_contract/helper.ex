@@ -13,7 +13,10 @@ defmodule Explorer.SmartContract.Helper do
 
   def error?(function), do: function["type"] == "error"
 
-  def read_with_wallet_method?(function), do: !error?(function) && !event?(function) && !constructor?(function) && nonpayable?(function) && empty_inputs?(function) && !empty_outputs?(function)
+  def read_with_wallet_method?(function),
+    do:
+      !error?(function) && !event?(function) && !constructor?(function) && nonpayable?(function) &&
+        empty_inputs?(function) && !empty_outputs?(function)
 
   def empty_inputs?(function), do: function["inputs"] == []
 
